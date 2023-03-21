@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/Baguette-Enjoyer/gin-start/database"
 	"github.com/google/uuid"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -18,12 +19,10 @@ type Todo struct {
 }
 
 func init(){
-	d,err := gorm.Open("mysql", "long3112:3112@tcp(127.0.0.1:3306)/todos?charset=utf8&parseTime=True&loc=Local")
-	if err != nil {
-		panic(err)
-	}
-	db = d
+	database.Config()
+	db = database.GetDB()
 	db.AutoMigrate(&Todo{})
+	db.Table("todobins").AutoMigrate(&TodoBin{})
 }
 func (todo *Todo) AddTodo()  *Todo {
 	db.Create(&todo)
@@ -37,14 +36,25 @@ func GetAllTodos() []Todo{
 
 func GetTodosById(id int) (*Todo,*gorm.DB){
 	var newTodo Todo
-	db.Where("id = ?",id).Find(&newTodo)
+	db.Table("todos").Where("id = ?",id).Find(&newTodo)
 	return &newTodo,db
 }
 
 func GetTodosByName(name string) ([]Todo){
 	var newTodo []Todo
 	var queryName = "%" + name + "%";
-	db.Where("name LIKE ? ",queryName).Find(&newTodo)
+	db.Table("todos").Where("name LIKE ? ",queryName).Find(&newTodo)
 	return newTodo
+}
+func DeleteTodoById(id int) *Todo {
+	var deleteTodo Todo
+	var newTodo Todo
+	db.Table("todos").Where("id = ?",id).Find(&newTodo).Delete(&deleteTodo)
+	go func (){
+		newBinItem := TodoBin{}
+		newBinItem.Name = newTodo.Name
+		db.Table("todobins").Create(&newBinItem)
+	}()
+	return &deleteTodo
 }
 

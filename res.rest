@@ -2,12 +2,19 @@ POST http://localhost:3000/addTodo
 Content-Type: application/json
 
 {
-    "Name":"learn go",
+    "Name":"go gin new new",
+    "IsDone":false
 }
 ### 
 GET http://localhost:3000/getAllTodos
 
+### 
+GET http://localhost:3000/getTodosBin
+### 
+GET http://localhost:3000/getTodosByName/?name=gin
+
 ###
+
 PUT http://localhost:3000/updateTodo/13
 Content-Type: application/json
 
@@ -15,3 +22,9 @@ Content-Type: application/json
     "Name":"learn go 20",
     "IsDone": false
 }
+
+###
+DELETE http://localhost:3000/deleteTodo/26
+
+###
+DELETE http://localhost:3000/cleanBin

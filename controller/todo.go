@@ -62,7 +62,7 @@ func UpdateTodo(ctx *gin.Context){
 	if todoBody.IsDone != newTodo.IsDone {
 		newTodo.IsDone = todoBody.IsDone
 	}
-	db.Save(&newTodo)
+	db.Table("todos").Save(&newTodo)
 	res,err := json.Marshal(&newTodo)
 	if err != nil {
 		panic(err)
@@ -76,8 +76,7 @@ func DeleteTodo(ctx *gin.Context){
 	if err != nil {
 		panic(err)
 	}
-	todo,db := models.GetTodosById(oid)
-	db.Delete(&todo)
+	todo:= models.DeleteTodoById(oid)
 	res,err := json.Marshal(&todo)
 	if err != nil {
 		panic(err)
